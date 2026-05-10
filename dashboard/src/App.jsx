@@ -18,6 +18,7 @@ function App() {
         
         {/* Performance */}
         <section id="performance">
+          <h2 className="text-xl font-bold text-slate-800 mb-4">2025 At a Glance</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2">
             {financialData.performance.map((item, i) => (
               <KpiCard key={i} {...item} />
