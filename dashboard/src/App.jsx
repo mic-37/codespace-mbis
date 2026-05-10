@@ -1,69 +1,73 @@
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, Cell } from 'recharts';
+import KpiCard from './components/KpiCard';
+import ComparativeChart from './components/ComparativeChart';
+import ComposedGrowthChart from './components/ComposedGrowthChart';
+import RatioTable from './components/RatioTable';
 import { financialData } from './data/financialData';
 
-const App = () => {
+function App() {
   return (
-    <div className="min-h-screen p-8 bg-gray-900 text-white">
-      <header className="mb-10">
-        <h1 className="text-4xl font-bold text-anz-teal">ANZ Financial Performance 2025</h1>
-        <p className="text-gray-400">Comparative Analysis: 2024 vs 2025</p>
-      </header>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {/* Income Card */}
-        <div className="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
-          <h2 className="text-xl font-semibold mb-4 text-white">Total Income (NZD Millions)</h2>
-          <div className="h-48">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={financialData.income}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-                <XAxis dataKey="year" stroke="#ccc" />
-                <YAxis stroke="#ccc" />
-                <Tooltip />
-                <Bar dataKey="value" fill="#00D1C1" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+    <div className="min-h-screen bg-slate-50 text-slate-900">
+      <nav className="bg-[#003366] text-white p-3 shadow-md sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-lg font-bold">ANZ NZ | FY2025 Investor Relations</h1>
         </div>
+      </nav>
 
-        {/* Profitability Card */}
-        <div className="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
-          <h2 className="text-xl font-semibold mb-4 text-white">Profitability Ratios (%)</h2>
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <span>Return on Equity (ROE)</span>
-              <span className="text-anz-teal font-bold text-lg">{financialData.profitability.roe.current}%</span>
-            </div>
-            <div className="flex justify-between items-center text-gray-500 text-sm">
-              <span>(Previous Year: {financialData.profitability.roe.prev}%)</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span>Net Interest Margin</span>
-              <span className="text-anz-teal font-bold text-lg">{financialData.profitability.netInterestMargin.current}%</span>
-            </div>
+      <main className="max-w-7xl mx-auto p-4 space-y-6">
+        
+        {/* Performance */}
+        <section id="performance">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2">
+            {financialData.performance.map((item, i) => (
+              <KpiCard key={i} {...item} />
+            ))}
           </div>
-        </div>
+        </section>
 
-        {/* Liquidity Card */}
-        <div className="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
-          <h2 className="text-xl font-semibold mb-4 text-white">Liquidity Coverage Ratio</h2>
-          <div className="h-48">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={financialData.liquidity}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-                <XAxis dataKey="name" stroke="#ccc" />
-                <YAxis stroke="#ccc" domain={[130, 160]} />
-                <Tooltip />
-                <Line type="monotone" dataKey="current" stroke="#00D1C1" strokeWidth={3} />
-                <Line type="monotone" dataKey="prev" stroke="#555" strokeDasharray="5 5" />
-              </LineChart>
-            </ResponsiveContainer>
+        {/* Comparative Analysis */}
+        <section id="comparative" className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <ComparativeChart 
+            title="Financial Performance ($B)" 
+            data={financialData.comparative.financials} 
+            lines={[
+              { key: 'Revenue', color: '#003366', name: 'Revenue' },
+              { key: 'NII', color: '#007bff', name: 'Net Interest Income' },
+              { key: 'PAT', color: '#28a745', name: 'PAT' }
+            ]} 
+          />
+          <ComposedGrowthChart 
+            title="Loan vs Deposit Growth (%)" 
+            data={financialData.comparative.growthTrend} 
+            bars={[
+              { key: 'deposit', color: '#dc3545', name: 'Deposit Growth' },
+              { key: 'loan', color: '#ffc107', name: 'Loan Growth' }
+            ]} 
+          />
+          <ComparativeChart 
+            title="Movement of Closing Price vs Benchmark Index (2025)" 
+            data={financialData.comparative.marketMonthly2025}
+            xAxisKey="month"
+            dualAxis={true}
+            lines={[
+              { key: 'closingPrice', color: '#003366', name: 'Closing Price (NZD)' },
+              { key: 'nzxIndex', color: '#dc3545', name: 'NZX Index' }
+            ]} 
+          />
+        </section>
+
+        {/* Ratios (Table View) */}
+        <section id="ratios" className="space-y-4">
+          <h2 className="text-xl font-bold text-slate-800">Ratio Analysis</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {Object.entries(financialData.ratios).map(([category, ratios]) => (
+              <RatioTable key={category} category={category} ratios={ratios} />
+            ))}
           </div>
-        </div>
-      </div>
+        </section>
+      </main>
     </div>
   );
-};
+}
 
 export default App;
